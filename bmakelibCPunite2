@@ -1,0 +1,17 @@
+SRC="./srcunite3"
+
+### create single UNIVERSAL labrary
+
+########### UNIVERSAL
+#OPT="-U CENTRAL -U PERIPHERAL"
+OPT="-D CENTRAL -U PERIPHERAL"
+
+#### compile sources
+for f in $SRC/*.c ; do cc $OPT -O3 -c $f ; done
+
+#### add to the library
+ar rcs libi_ion.a *.o
+
+### remove all *.o
+rm *.o
+

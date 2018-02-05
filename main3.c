@@ -152,7 +152,7 @@ main(int argc, char **argv){
 
     Cp1.ctype=atof(argv[1]);
     settype(&Cp1);    
-    ach=0e-8; //2.5e-8;			// consts here
+    ach=0e-8; //2.5e-8;
 
   {
     FILE *fin = fopen( "state.dat", "r" );	// recent in this dir
@@ -169,22 +169,22 @@ main(int argc, char **argv){
   }
 
 	FILE *E_fout = fopen( "E.txt", "w+" );
+  	int counter = 0;
+
   	// timestepping 
   	for( t=0; t<trun; t+=ht )
   	{
-      potentials();				// Nernst potentials
-      basic_pars( -30, St1.E, Stn1.E, t, ht );	// check fronts, periods etc.
+      potentials();	// Nernst potentials
 
 
+   	{
+   		static float tgt=0.;
+		if( t>=tgt )
+		{
+	       		tgt += 0.001;	// [s]
+	       		fprintf(E_fout, "%.2f,%.2f\n", t, Stn1.E);
 
-   {
-   	static float tgt=0.;
-	if( t>=tgt )
-	{
-	       tgt += 0.001;	// [s]
-	       fprintf(E_fout, "%.2f,%.2f\n", t, Stn1.E);
-
-	}
+		}
    }//output
 	    
 	{St1 = Stn1; mintau = 1e33;}
@@ -216,14 +216,18 @@ main(int argc, char **argv){
 
 #endif //TABLE
       
-      // Euler step
+      // Forward Euler step
        Stn1.E = St1.E + ht*(Func(ht,&Stn1, &St1, &Cp1, &I1, T1, &Ca1));
        Cp1.cai = ca_intra(ht, I1.fical+I1.ficat-2*I1.finaca+I1.ficap+I1.fibgca, &Cp1, &Ca1);
 #if IONS
        Cp1.nai += ht* -1e6*(I1.fina+3.*I1.finaca+3.*I1.fip+I1.fibgna+I1.fifna)/(FRD*Cp1.vi); 
        Cp1.ki  += ht* -1e6*(-2.*I1.fip+I1.fikr+I1.fiks+I1.fikach+I1.fito+I1.fisus+I1.fifk+I1.fibgk)/(FRD*Cp1.vi);
 #endif
-
+       
+       // tracking of the progress
+       counter += 1;
+       if ((counter%100000) == 0) 
+       		printf("Step #%d\n", counter);
 
     }//for_t
 	

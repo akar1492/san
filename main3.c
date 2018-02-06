@@ -168,13 +168,13 @@ main(int argc, char **argv){
     fclose(fin);
   }
 
-	FILE *E_fout = fopen( "E.txt", "w+" );
+	FILE *fout_second = fopen( "out.txt", "w+" );
   	int counter = 0;
 
   	// timestepping 
   	for( t=0; t<trun; t+=ht )
   	{
-      potentials();	// Nernst potentials
+      	potentials();	// Nernst potentials
 
 
    	{
@@ -182,7 +182,7 @@ main(int argc, char **argv){
 		if( t>=tgt )
 		{
 	       		tgt += 0.001;	// [s]
-	       		fprintf(E_fout, "%.2f,%.2f\n", t, Stn1.E);
+	       		fprintf(fout_second, "%.2f, %f\n", t, Stn1.E);
 
 		}
    }//output
@@ -226,8 +226,10 @@ main(int argc, char **argv){
        
        // tracking of the progress
        counter += 1;
-       if ((counter%100000) == 0) 
+       if ((counter%100000) == 0)
+       {
        		printf("Step #%d\n", counter);
+       }
 
     }//for_t
 	
@@ -239,5 +241,7 @@ main(int argc, char **argv){
 	fwrite( &Cp1.ki, sizeof(REAL), 1, fout );
 	fclose(fout);
 #endif //WRITEIC
-  clocks('p');
+  	
+  	clocks('p');
+  	fclose(fout_second);
 }//main

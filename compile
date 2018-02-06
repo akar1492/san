@@ -1,1 +1,1 @@
-gcc -O2 -o ttt  main3.c  -lm -L. -li_ion
+gcc -O2 -o san_exe  main3.c  -lm -L. -li_ion

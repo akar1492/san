@@ -30,7 +30,7 @@ inaca(struct State *S, struct State *Sn, REAL ht, struct Cpar *C, struct Caintra
   nai3 = C->nai*C->nai*C->nai;
   nao3 = nao*nao*nao;
 
-  return C->knaca*( nai3*cao  * exp(S->E*0.03743*gnaca) - nao3*Ca->cai * exp(S->E*0.03743f*(gnaca-1)))  / (1+ dnaca*(nao3*Ca->cai + nai3*cao));
+  return C->knaca*( nai3*cao  * exp(S->E*0.03743*gnaca) - nao3*Ca->casub * exp(S->E*0.03743f*(gnaca-1)))  / (1+ dnaca*(nao3*Ca->casub+nai3*cao));
 
 
 } /** inaca **/

@@ -26,6 +26,7 @@ REAL ca_intra(REAL ht, REAL icatotal, struct Cpar *C, struct Caintra_state *Ca )
   ht *= 1000; 	// time in ms (was s)
 
   //NOTE! we use cai from the argument
+  //  Ca.casub = cai;	
   Ca->cai = C->cai;	
 
   // Ca++ buffering -- derivatives on t
@@ -35,6 +36,14 @@ REAL ca_intra(REAL ht, REAL icatotal, struct Cpar *C, struct Caintra_state *Ca )
   dfcq 	= kfcq*Ca->carel*(1.-Ca->fcq)-kbcq*Ca->fcq;
   dftmc = kftmc*Ca->cai*(1.-Ca->ftmc-Ca->ftmm)-kbtmc*Ca->ftmc;
   dftmm = kftmm*mgi*(1.-Ca->ftmc-Ca->ftmm)-kbtmm*Ca->ftmm; 
+
+///// TEMP!!!!test
+/*   dftc 	=0;  */
+/*   dfcmi =0; */
+/*   dfcms =0; */
+/*   dfcq 	=0; */
+/*   dftmc =0; */
+/*   dftmm =0; */
 
   // Ca++ fluxes: diffusion and because of SR
   jcadiff = (Ca->casub-Ca->cai)/tdiffca;
@@ -74,14 +83,16 @@ REAL ca_intra(REAL ht, REAL icatotal, struct Cpar *C, struct Caintra_state *Ca )
     for( ;first2;first2=0) foca = fopen( "ca.dat", "w" );
 
     if( t>=tgt )
-    {
-        tgt += 1e-3;	// [s]
-        fprintf( foca, "%g\t%g %g %g %g %g %g %g %g %g %g   %g\t%g\t%g\t%g\n", t,  
-        Ca->ftc, Ca->ftmc, Ca->ftmm, Ca->fcmi, Ca->fcms, Ca->fcq, Ca->cai, Ca->casub, Ca->caup, Ca->carel,  icatotal,  jrel*C->vrel/C->vsub,-jcadiff, -cmtot*dfcms  );
-    }
-  } //save_ca_data
+      {
+	tgt += 1e-3;	// [s]
+	fprintf( foca, "%g\t%g %g %g %g %g %g %g %g %g %g   %g\t%g\t%g\t%g\n", t,  
+		 Ca->ftc, Ca->ftmc, Ca->ftmm, Ca->fcmi, Ca->fcms, Ca->fcq, Ca->cai, Ca->casub, Ca->caup, Ca->carel,  icatotal,  jrel*C->vrel/C->vsub,-jcadiff, -cmtot*dfcms  );
+
+      }
+  }//save_ca_date
 #endif
 
+  //  return casub_new;
   return Ca->cai;
 } /** ca_intra **/
 

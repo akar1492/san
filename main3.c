@@ -124,6 +124,7 @@ fitotal(struct State *St, struct State *Stn,REAL ht, struct Cpar *Cp, struct Is 
   I->finaca = inaca(St, Stn, ht, Cp,Ca);
   I->fip = ip(St, Stn, ht, Cp);
   I->ficap = icap(Cp,Ca);
+//printf("!!!!!!!!!fibgna=%g\n fibgca=%g\n fibgk=%g\n fical=%g\n ficat=%g\n fif=%g\n fikr=%g\n fiks=%g\n fina=%g\n finaca=%g\n fip=%g\n fisus=%g\n fito=%g\n fikach=%g\n fist=%g\n ficap=%g\n", I->fibgna,I->fibgca,I->fibgk,I->fical,I->ficat,I->fif,I->fikr,I->fiks,I->fina,I->finaca,I->fip,I->fisus,I->fito,I->fikach,I->fist,I->ficap);
   return I->fibgna+I->fibgca+I->fibgk+I->fical+I->ficat+I->fif+I->fikr+I->fiks+I->fina+I->finaca+I->fip+I->fisus+I->fito +I->fikach +I->fist +I->ficap;
 }
 ///////////////////////////////////////////////////////////////////////////
@@ -145,14 +146,29 @@ potentials()
   Cp1.ENA 	= RTF* log(nao/Cp1.nai);
   Cp1.EK 		= RTF* log(ko/Cp1.ki);
   Cp1.ECA =	0.5*RTF*log(cao/Cp1.cai); // zca=2;
+
+
 } /** potentials **/
 
 ///////////////////////////////////////////////////////////////////////////
 main(int argc, char **argv){
 
-    Cp1.ctype=atof(argv[1]);
-    settype(&Cp1);    
-    ach=0e-8; //2.5e-8;
+   Cp1.ctype=atof(argv[1]);
+   settype(&Cp1);
+//   printf("#ctype=%g\n", ctype );
+//     trun=atof(argv[2]);
+//   printf("#trun=%g\n", trun );
+//  ctype=1.0;
+
+
+//    printf("###cm\t%g\n gna\t%g\n gto\t%g\n gsus\t%g\n gkr\t%g\n gks\t%g\n gfna\t%g\n gfk\t%g\n gbna\t%g\n gbca\t%g\n gbk\t%g\n ipss\t%g\n knaca\t%g\n icapmax\t%g\n kachical\t%g\n kachicat\t%g\n kachikach\t%g\n", cm, gna, gto, gsus, gkr, gks, gfna, gfk, gbna, gbca, gbk, ipss, knaca, icapmax, kachical, kachicat, kachikach);
+  
+
+
+  ach=0e-8; //2.5e-8;			// consts here
+
+
+//  printf("###gcal,gcat= %g %g\n", gcal, gcat );
 
   {
     FILE *fin = fopen( "state.dat", "r" );	// recent in this dir
@@ -160,32 +176,28 @@ main(int argc, char **argv){
     fread( &Stn1, sizeof(struct State), 1, fin );
 
 
-    fread( &Ca1, sizeof(struct Caintra_state), 1, fin );
+      fread( &Ca1, sizeof(struct Caintra_state), 1, fin );
 
-    Cp1.cai = Ca1.cai;				// saved value
-    fread( &Cp1.nai, sizeof(REAL), 1, fin );
-    fread( &Cp1.ki, sizeof(REAL), 1, fin );
-    fclose(fin);
-  }
-
-	FILE *fout_second = fopen( "out.txt", "w+" );
-  	int counter = 0;
-
-  	// timestepping 
-  	for( t=0; t<trun; t+=ht )
-  	{
-      	potentials();	// Nernst potentials
+      Cp1.cai = Ca1.cai;				// saved value
+      fread( &Cp1.nai, sizeof(REAL), 1, fin );
+      fread( &Cp1.ki, sizeof(REAL), 1, fin );
+//	Cp1.ki=140;
+   fclose(fin);}
 
 
-   	{
-   		static float tgt=0.;
-		if( t>=tgt )
-		{
-	       		tgt += 0.001;	// [s]
-	       		fprintf(fout_second, "%.2f, %f\n", t, Stn1.E);
+ 
 
-		}
-   }//output
+  for( t=0; t<trun; t+=ht ){
+      potentials();				// Nernst potentials
+      basic_pars( -30, St1.E, Stn1.E, t, ht );	// check fronts, periods etc.
+
+
+
+      {static float tgt=0.;
+	if( t>=tgt ){
+	       tgt += 0.001;	// [s]
+		printf("%g\t%g\t%g %g %g %g %g %g %g %g %g %g %g %g %g\t%g %g %g %g\n", t, Stn1.E, I1.fibgna+I1.fibgca+I1.fibgk,I1.fical,I1.ficat,I1.fif,I1.fikr,I1.fiks,I1.fina,I1.finaca,I1.fip,I1.fisus,I1.fito,I1.fikach,I1.fist,I1.ficap,  Cp1.cai, Cp1.ki, Cp1.nai );
+}}//output
 	    
 	{St1 = Stn1; mintau = 1e33;}
 #if WRITEIC
@@ -215,21 +227,16 @@ main(int argc, char **argv){
     
 
 #endif //TABLE
-      
-      // Forward Euler step
+      // Euler 
+
+
        Stn1.E = St1.E + ht*(Func(ht,&Stn1, &St1, &Cp1, &I1, T1, &Ca1));
        Cp1.cai = ca_intra(ht, I1.fical+I1.ficat-2*I1.finaca+I1.ficap+I1.fibgca, &Cp1, &Ca1);
 #if IONS
        Cp1.nai += ht* -1e6*(I1.fina+3.*I1.finaca+3.*I1.fip+I1.fibgna+I1.fifna)/(FRD*Cp1.vi); 
        Cp1.ki  += ht* -1e6*(-2.*I1.fip+I1.fikr+I1.fiks+I1.fikach+I1.fito+I1.fisus+I1.fifk+I1.fibgk)/(FRD*Cp1.vi);
 #endif
-       
-       // tracking of the progress
-       counter += 1;
-       if ((counter%100000) == 0)
-       {
-       		printf("Step #%d\n", counter);
-       }
+
 
     }//for_t
 	
@@ -241,7 +248,5 @@ main(int argc, char **argv){
 	fwrite( &Cp1.ki, sizeof(REAL), 1, fout );
 	fclose(fout);
 #endif //WRITEIC
-  	
-  	clocks('p');
-  	fclose(fout_second);
+  clocks('p');
 }//main

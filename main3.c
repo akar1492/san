@@ -1,4 +1,9 @@
-// main module to cal SA (central)
+// Main module to cal SA (central)
+
+// The full set of equations can be found in [Aliev RR. Conceptual and Detailed Models of Electrical Activity of the Myocardium. 
+// Lambert Academic Publishing: Saarbrucken, Germany. 2012. ISBN:978-3-8465-3943-9 (in Russian).]
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

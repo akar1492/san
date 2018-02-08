@@ -182,7 +182,7 @@ main(int argc, char **argv){
 		if( t>=tgt )
 		{
 	       		tgt += 0.001;	// [s]
-	       		fprintf(fout_second, "%.2f, %f\n", t, Stn1.E);
+	       		fprintf(fout_second, "%f, %f\n", t, Stn1.E);
 
 		}
    }//output

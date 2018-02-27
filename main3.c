@@ -152,13 +152,55 @@ potentials()
   Cp1.ECA =	0.5*RTF*log(cao/Cp1.cai); // zca=2;
 } /** potentials **/
 
+
+
+// default initial conditions
+void initial_conditions(struct State *Stn, struct Caintra_state *Ca, struct Cpar* Cp)
+{
+  Stn->E=-70.5; 
+  Stn->m=0.086;
+  Stn->h1=0.74; 
+  Stn->h2=0.085;
+  Stn->fl=0.995;
+  Stn->dl=0.00034; 
+  Stn->ft=0.55; 
+  Stn->dt=0.0071; 
+  Stn->q=0.74;
+  Stn->r=0.015;
+  Stn->paf=0.021;
+  Stn->pas=0.28;
+  Stn->pii=0.994;
+  Stn->xs=0.097;
+  Stn->y=0.077;
+  Stn->jach=0.77;
+  Stn->kach=0.59;
+  Stn->qa=0.93;
+  Stn->qi=0.011;
+  Cp->nai=8.24;
+  Cp->ki=140.;
+  Ca->ftc=0.057; 
+  Ca->ftmc=0.64;
+  Ca->ftmm=0.32;
+  Ca->fcmi=0.11;
+  Ca->fcms=0.033;
+  Ca->fcq=0.21;
+  Cp->cai=0.002;
+  Ca->casub=8.2e-5; 
+  Ca->caup=1.66;
+  Ca->carel=0.22;
+
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////
 main(int argc, char **argv){
 
     Cp1.ctype=atof(argv[1]);
     settype(&Cp1);    
-    ach=0e-8; //2.5e-8;
+    ach = 2.5e-8;
 
+  /*
   {
     FILE *fin = fopen( "state.dat", "r" );	// recent in this dir
     if(!fin) exit(puts("!!! Cannot open IC file"));
@@ -171,7 +213,9 @@ main(int argc, char **argv){
     fread( &Cp1.nai, sizeof(REAL), 1, fin );
     fread( &Cp1.ki, sizeof(REAL), 1, fin );
     fclose(fin);
-  }
+  }*/
+ 
+    initial_conditions(&Stn1, &Ca1, &Cp1);
 
 	FILE *fout_second = fopen( "out.txt", "w+" );
   	int counter = 0;
@@ -187,7 +231,7 @@ main(int argc, char **argv){
 		if( t>=tgt )
 		{
 	       		tgt += 0.001;	// [s]
-	       		fprintf(fout_second, "%f, %f\n", t, Stn1.E);
+	       		fprintf(fout_second, "%f,%f,%f,%f,%f\n", t, Stn1.E, Cp1.nai, Cp1.ki, Cp1.cai);
 
 		}
    }//output
